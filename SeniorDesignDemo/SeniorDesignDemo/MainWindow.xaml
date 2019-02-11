@@ -1,0 +1,29 @@
+﻿<Window x:Class="SeniorDesignDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SeniorDesignDemo"
+        mc:Ignorable="d"
+        Title="OxyPlot Practice" Height="500" Width="800">
+    <StackPanel Height="450" Width="800">
+        <StackPanel.DataContext>
+            <local:MainViewModel/>
+        </StackPanel.DataContext>
+        <!--<oxy:PlotView Model="{Binding MyModel}" Height="200" Width="750"/>-->
+        <!--<oxy:PlotView Model="{Binding MySecondModel}" Height="200" Width="750"/>-->
+        <Button Name="btnOpenFile" Click="btnOpenFile_Click" Width="100">Choose File</Button>
+        <oxy:PlotView Model="{Binding MyThirdModel}" Height="200" Width="750"/>
+        <ListView x:Name="ListViewData" Height="200" Width="750">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Time" Width="100" DisplayMemberBinding="{Binding Path=Time}"/>
+                    <GridViewColumn Header="Altitude" Width="150" DisplayMemberBinding="{Binding Path=Altitude}"/>
+                    <GridViewColumn Header="Temperature" Width="40" DisplayMemberBinding="{Binding Path=Temp}"/>
+                    <GridViewColumn Header="Voltage" Width="200" DisplayMemberBinding="{Binding Path=Voltage}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </StackPanel>
+</Window>
