@@ -8,11 +8,13 @@ public class SerialDataSaver
 
     public static void Main()
     {
-        string message;
+        string message, fileName;
 
         SerialPort serialPort = new SerialPort();
 
         serialPort.PortName = SetPortName(serialPort.PortName);
+
+        fileName = SetFileName("SavedData.txt");
 
         serialPort.BaudRate = 9600;
         serialPort.Parity = Parity.None;
@@ -32,7 +34,7 @@ public class SerialDataSaver
             {
                 message = serialPort.ReadLine();
                 Console.WriteLine(message);
-                AppendToFile(message);
+                AppendToFile(fileName, message);
 
             }
             catch (TimeoutException) { }
@@ -41,9 +43,9 @@ public class SerialDataSaver
         serialPort.Close();
     }
 
-    public static void AppendToFile(string message)
+    public static void AppendToFile(string fileName, string message)
     {
-        string path = @"c:\temp\SavedData.txt";
+        string path = @"c:\temp\" + fileName;
         using (StreamWriter sw = File.AppendText(path))
         {
             sw.WriteLine(message);
@@ -71,5 +73,21 @@ public class SerialDataSaver
         }
         return portName;
     }
- 
+
+    // Prompt the user to enter a file name to create or append to.
+    public static string SetFileName(string defaultFileName)
+    {
+        string fileName;
+
+        Console.WriteLine("Enter the name of the file to save to:");
+        fileName = Console.ReadLine();
+
+        if (fileName == "" || !(fileName.ToLower()).EndsWith(".txt"))
+        {
+            fileName = defaultFileName;
+        }
+
+        return fileName;
+    }
+
 }
