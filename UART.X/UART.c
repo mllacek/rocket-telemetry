@@ -75,39 +75,38 @@ void U2_send_string(char* st_pt)
         putU2(*st_pt++);//process it as a byte data
 }
 
-char* pt U1_get_string(void)
-{
-    return *getU1();
-    //TODO
-}
 
 void main(void) {
     InitU1();
     InitU2();
     ms_delay(500);
-    srand(time(NULL));   // Initialization, should only be called once.
+    //srand(time(NULL));   // Initialization, should only be called once.
     
-    char buffer [50];
-
-    int t = 0;
+    //char buffer [50];
+    char c;
+    //int t = 0;
     while (1) {
-        int r = rand()% 20; // Returns a pseudo-random integer between 0 and 19.
-        t = t + r;
-        sprintf (buffer, "%d", t);
-        U2_send_string(buffer);
-        ms_delay(2); // wait 500 us as suggested
-        putU2('\n');
-        ms_delay(2); // wait 500 us as suggested
-        r = rand()% 20;
-        t = t - r;
-        sprintf (buffer, "%d", t);
-        U2_send_string(buffer);
-        ms_delay(2); // wait 500 us as suggested
-        putU2('\n');
-        ms_delay(500);
+        //int r = rand()% 20; // Returns a pseudo-random integer between 0 and 19.
+        //t = t + r;
+        //sprintf (buffer, "%d", t);
+        //U2_send_string(buffer);
+        //ms_delay(2); // wait 500 us as suggested
+        //putU2('\n');
+        //ms_delay(2); // wait 500 us as suggested
+        //r = rand()% 20;
+        //t = t - r;
+        //sprintf (buffer, "%d", t);
+        //U2_send_string(buffer);
+        //ms_delay(2); // wait 500 us as suggested
+        //putU2('\n');
+        //ms_delay(500);
         
-        getU1();
-        getU1();
+        c = getU1();
+        ms_delay(500);
+        putU2(c);
+        ms_delay(500);
+        U2_send_string("Test");
+        ms_delay(500);
     }
     
 }
