@@ -58,11 +58,11 @@ xc16-ld 1.35 (A)
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-.text                        0x200                0xce           0x135  (309)
-.const                       0x2ce                 0x6             0x9  (9)
-.text                        0x2d4                0xfa           0x177  (375)
+.text                        0x200               0x10e           0x195  (405)
+.const                       0x30e                 0xc            0x12  (18)
+.text                        0x31a               0x100           0x180  (384)
 
-                 Total "program" memory used (bytes):          0x2b5  (693) <1%
+                 Total "program" memory used (bytes):          0x327  (807) <1%
 
 
 "data" Memory  [Origin = 0x800, Length = 0x2000]
@@ -87,37 +87,39 @@ External Symbols in Program Memory (by address):
 
                   0x000200                  __resetPRI
                   0x00023c                  __psv_init
-                  0x000252                  __data_init_standard
                   0x000252                  __data_init
-                  0x0002c8                  __DefaultInterrupt
-                  0x0002d4                  _us_delay
-                  0x0002f0                  _ms_delay
-                  0x000310                  _InitU2
-                  0x000322                  _InitU1
-                  0x000334                  _putU1
-                  0x00034e                  _putU2
-                  0x000368                  _getU1
-                  0x00037c                  _getU2
-                  0x000390                  _U2_send_string
-                  0x0003aa                  _main
+                  0x000252                  __data_init_standard
+                  0x0002c8                  __U1RXInterrupt
+                  0x000308                  __DefaultInterrupt
+                  0x00031a                  _us_delay
+                  0x000336                  _ms_delay
+                  0x000356                  _InitU2
+                  0x000368                  _InitU1
+                  0x000390                  _putU1
+                  0x0003aa                  _putU2
+                  0x0003c4                  _getU1
+                  0x0003d0                  _getU2
+                  0x0003e4                  _U2_send_string
+                  0x0003fe                  _main
 
 External Symbols in Program Memory (by name):
 
-                  0x000322                  _InitU1
-                  0x000310                  _InitU2
-                  0x000390                  _U2_send_string
-                  0x0002c8                  __DefaultInterrupt
+                  0x000368                  _InitU1
+                  0x000356                  _InitU2
+                  0x0003e4                  _U2_send_string
+                  0x000308                  __DefaultInterrupt
+                  0x0002c8                  __U1RXInterrupt
                   0x000252                  __data_init
                   0x000252                  __data_init_standard
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
-                  0x000368                  _getU1
-                  0x00037c                  _getU2
-                  0x0003aa                  _main
-                  0x0002f0                  _ms_delay
-                  0x000334                  _putU1
-                  0x00034e                  _putU2
-                  0x0002d4                  _us_delay
+                  0x0003c4                  _getU1
+                  0x0003d0                  _getU2
+                  0x0003fe                  _main
+                  0x000336                  _ms_delay
+                  0x000390                  _putU1
+                  0x0003aa                  _putU2
+                  0x00031a                  _us_delay
 
 Memory Configuration
 
@@ -153,7 +155,7 @@ LOAD c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\libfx-elf.a
                   0x000002          0x2 SHORT 0x0 ((ABSOLUTE (__reset) >> 0x10) & 0x7f)
                   0x000003          0x2 SHORT 0x0
 
-.text             0x000200         0xce
+.text             0x000200        0x10e
  *(.init)
  .init            0x000200         0x4c c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o)
                   0x000200                  __resetPRI
@@ -165,16 +167,18 @@ LOAD c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\libfx-elf.a
  *(.user_init)
  *(.handle)
  *(.isr*)
- .isr             0x0002c8          0x4 default_isr
-                  0x0002c8                  __DefaultInterrupt
+ .isr.text        0x0002c8         0x40 build/default/production/UART.o
+                  0x0002c8                  __U1RXInterrupt
+ .isr             0x000308          0x4 default_isr
+                  0x000308                  __DefaultInterrupt
  *(.libc)
  *(.libm)
  *(.libdsp)
  *(.lib*)
  .libpic30_crt_start_mode
-                  0x0002cc          0x2 c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\liblega-pic30-elf.a(crt_start_mode_normal.Leo)
-                  0x0002cc                  __crt_start_mode
-                  0x0002cc                  __crt_start_mode_normal
+                  0x00030c          0x2 c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\liblega-pic30-elf.a(crt_start_mode_normal.Leo)
+                  0x00030c                  __crt_start_mode
+                  0x00030c                  __crt_start_mode_normal
 
 usercode
  *(usercode)
@@ -190,26 +194,26 @@ __CONFIG1         0x0157fe          0x2
 .comment
  *(.comment)
 
-.debug_info       0x000000        0x7da
+.debug_info       0x000000        0xc6a
  *(.debug_info)
- .debug_info      0x000000        0x7da build/default/production/UART.o
+ .debug_info      0x000000        0xc6a build/default/production/UART.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0x159
+.debug_abbrev     0x000000        0x197
  *(.debug_abbrev)
- .debug_abbrev    0x000000        0x159 build/default/production/UART.o
+ .debug_abbrev    0x000000        0x197 build/default/production/UART.o
 
-.debug_line       0x000000        0x11d
+.debug_line       0x000000        0x137
  *(.debug_line)
- .debug_line      0x000000        0x11d build/default/production/UART.o
+ .debug_line      0x000000        0x137 build/default/production/UART.o
 
-.debug_frame      0x000000        0x12c
+.debug_frame      0x000000        0x170
  *(.debug_frame)
- .debug_frame     0x000000        0x12c build/default/production/UART.o
+ .debug_frame     0x000000        0x170 build/default/production/UART.o
 
-.debug_str        0x000000         0x38
+.debug_str        0x000000         0x53
  *(.debug_str)
- .debug_str       0x000000         0x38 build/default/production/UART.o
+ .debug_str       0x000000         0x53 build/default/production/UART.o
 
 .debug_loc
  *(.debug_loc)
@@ -218,10 +222,10 @@ __CONFIG1         0x0157fe          0x2
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000         0xa0
+                  0x000000         0xb3
  *(.debug_pubnames)
  .debug_pubnames
-                  0x000000         0xa0 build/default/production/UART.o
+                  0x000000         0xb3 build/default/production/UART.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -811,31 +815,36 @@ OUTPUT(dist/default/production/UART.X.production.elf elf32-pic30)
 LOAD default_isr
 
 .debug_pubtypes
-                  0x000018         0x5d
+                  0x000018         0xb4
  .debug_pubtypes
-                  0x000018         0x5d build/default/production/UART.o
+                  0x000018         0xb4 build/default/production/UART.o
 
 __c30_signature
-                  0x000075         0x12
+                  0x0000cc         0x12
  __c30_signature
-                  0x000075          0x6 build/default/production/UART.o
+                  0x0000cc          0x6 build/default/production/UART.o
  __c30_signature
-                  0x00007b          0x6 c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o)
+                  0x0000d2          0x6 c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o)
  __c30_signature
-                  0x000081          0x6 c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\liblega-pic30-elf.a(data_init_standard.o)
+                  0x0000d8          0x6 c:/program files (x86)/microchip/xc16/v1.35/bin/bin/../../lib\liblega-pic30-elf.a(data_init_standard.o)
 
-.const              0x82ce          0x6 load address 0x0002ce  
- .const             0x82ce          0x6 build/default/production/UART.o
+.ivt._U1RXInterrupt
+                  0x00002a          0x2
+ .ivt._U1RXInterrupt
+                  0x00002a          0x2 build/default/production/UART.o
 
-.text             0x0002d4         0xfa
- .text            0x0002d4         0xfa build/default/production/UART.o
-                  0x0002d4                  _us_delay
-                  0x0002f0                  _ms_delay
-                  0x000310                  _InitU2
-                  0x000322                  _InitU1
-                  0x000334                  _putU1
-                  0x00034e                  _putU2
-                  0x000368                  _getU1
-                  0x00037c                  _getU2
-                  0x000390                  _U2_send_string
-                  0x0003aa                  _main
+.const              0x830e          0xc load address 0x00030e  
+ .const             0x830e          0xc build/default/production/UART.o
+
+.text             0x00031a        0x100
+ .text            0x00031a        0x100 build/default/production/UART.o
+                  0x00031a                  _us_delay
+                  0x000336                  _ms_delay
+                  0x000356                  _InitU2
+                  0x000368                  _InitU1
+                  0x000390                  _putU1
+                  0x0003aa                  _putU2
+                  0x0003c4                  _getU1
+                  0x0003d0                  _getU2
+                  0x0003e4                  _U2_send_string
+                  0x0003fe                  _main
