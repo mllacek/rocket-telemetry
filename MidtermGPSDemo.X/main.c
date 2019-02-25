@@ -4,8 +4,8 @@
 
 #include "config.h"
 
-char getU1(void);
-char putU2(char);
+char getU1(void); //FROM GPS
+char putU2(char); //TO PC
 void ms_delay(int);
 
 void _ISR _U1RXInterrupt (void)
@@ -98,8 +98,8 @@ void U1_send_string(char* st_pt)
 
 
 void main(void) {
-    InitU1();
     InitU2();
+    InitU1();
 
     while (1) {
         //loop forever
