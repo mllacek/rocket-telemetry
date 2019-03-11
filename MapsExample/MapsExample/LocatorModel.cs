@@ -8,48 +8,45 @@ using System.Threading.Tasks;
 
 namespace MapsExample
 {
-    class LocatorModel
+    public class LocatorModel
     {
-        public class ProductModel
+        private PointLatLng _rocketLocation;
+        private PointLatLng _userLocation;
+
+        public PointLatLng RocketLocation
         {
-            private PointLatLng _rocketLocation;
-            private PointLatLng _userLocation;
-
-            public PointLatLng RocketLocation
+            get { return _rocketLocation; }
+            set
             {
-                get { return _rocketLocation; }
-                set
+                if (value != _rocketLocation)
                 {
-                    if (value != _rocketLocation)
-                    {
-                        _rocketLocation = value;
-                        RaisePropertyChanged("RocketLocation");
-                    }
+                    _rocketLocation = value;
+                    RaisePropertyChanged("RocketLocation");
                 }
             }
+        }
 
-            public PointLatLng UserLocation
+        public PointLatLng UserLocation
+        {
+            get { return _userLocation; }
+            set
             {
-                get { return _userLocation; }
-                set
+                if (value != _userLocation)
                 {
-                    if (value != _userLocation)
-                    {
-                        _userLocation = value;
-                        RaisePropertyChanged("UserLocation");
-                    }
+                    _userLocation = value;
+                    RaisePropertyChanged("UserLocation");
                 }
             }
+        }
 
-            public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-            protected void RaisePropertyChanged(string property)
+        protected void RaisePropertyChanged(string property)
+        {
+            var handler = this.PropertyChanged;
+            if (handler != null)
             {
-                var handler = this.PropertyChanged;
-                if (handler != null)
-                {
-                    handler(this, new PropertyChangedEventArgs(property));
-                }
+                handler(this, new PropertyChangedEventArgs(property));
             }
         }
     }
