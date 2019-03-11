@@ -22,6 +22,7 @@ namespace MapsExample
 
         public MainViewModel()
         {
+            //TODO: parse NMEA format?
             var lat1 = Nmea2DecDeg("4104.5938", "N");
             var long1 = Nmea2DecDeg("08130.7754", "W");
 
@@ -29,11 +30,13 @@ namespace MapsExample
             var long2 = Nmea2DecDeg("08130.8436", "W");
 
             LocatorModel locationData = new LocatorModel();
-            locationData.RocketLocation = new PointLatLng(lat1, long1);
-            locationData.UserLocation = new PointLatLng(lat2, long2);
+            CurrentLocation.RocketLocation = new PointLatLng(lat1, long1);
+            CurrentLocation.UserLocation = new PointLatLng(lat2, long2);
 
-            Distance = GMapProviders.EmptyProvider.Projection.GetDistance(locationData.UserLocation, locationData.RocketLocation);
+            Distance = GMapProviders.EmptyProvider.Projection.GetDistance(locationData.UserLocation, locationData.RocketLocation) * 0.62137; //convert km to miles
             Bearing = GMapProviders.EmptyProvider.Projection.GetBearing(locationData.UserLocation, locationData.RocketLocation);
+
+            CurrentLocation = locationData; //TODO: why is this not updating the UI?
         }
 
         public LocatorModel CurrentLocation
