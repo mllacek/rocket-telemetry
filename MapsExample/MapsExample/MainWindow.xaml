@@ -7,20 +7,21 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <DockPanel>
-        <StackPanel Orientation="Vertical" Margin="10">
-            <Button Name="btnOpenFile" Command="{Binding SelectFileCommand}" Width="100">Choose File</Button>
-            <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Vertical" Margin="10" >
+            <Button Name="btnOpenFile" Command="{Binding SelectFileCommand}" Width="100" Margin="10px">Choose File</Button>
+            <StackPanel Orientation="Horizontal" Margin="5px">
                 <Label>Distance to rocket (miles):</Label>
-                <TextBox Text="{Binding Distance, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
+                <TextBox Text="{Binding Distance, Mode=OneWay, StringFormat={}{0:#,0.00}}" MinWidth="50" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" Margin="5px">
                 <Label>Bearing to rocket (degrees):</Label>
-                <TextBox Text="{Binding Bearing, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
+                <TextBox Text="{Binding Bearing, Mode=OneWay, StringFormat={}{0:#,0.00}}" MinWidth="50" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" Margin="5px">
                 <Label>Last Known Rocket Coordinates (Decimal Degrees):</Label>
-                <TextBox Text="{Binding Path=RocketLocation.Lat, Source=CurrentLocation, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
-                <TextBox Text="{Binding Path=RocketLocation.Lng, Source=CurrentLocation, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
+                <TextBox Text="{Binding CurrentLocation.RocketLocation.Lat, Mode=OneWay, StringFormat={}{0:#,0.00}}" MinWidth="50"/>
+                <Label>,</Label>
+                <TextBox Text="{Binding CurrentLocation.RocketLocation.Lng, Mode=OneWay, StringFormat={}{0:#,0.00}}" MinWidth="50"/>
             </StackPanel>
         </StackPanel>
         <!--TODO: add map-->
