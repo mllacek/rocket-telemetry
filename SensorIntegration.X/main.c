@@ -3,6 +3,7 @@
 #include "gyroscope.h"
 #include "accelerometer.h"
 #include "barometric_pressure.h"
+#include "config.h"
 
 #include <libpic30.h>
 #include <stdio.h>

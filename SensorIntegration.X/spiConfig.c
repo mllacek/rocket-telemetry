@@ -1,4 +1,4 @@
-#include "config.h"
+#include <xc.h>
 
 //Accel and BarPressure use SPI1 with the setting 0x0320
 void SPI1Init(void) {

@@ -11,5 +11,6 @@ void InitU1(void);
 char putU1(char c);
 char getU1 ( void );
 void InitU2(void);
+char putU2(char c);
 #endif	/* UARTCONFIG_H */
 

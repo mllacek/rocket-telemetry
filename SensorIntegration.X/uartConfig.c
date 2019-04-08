@@ -1,7 +1,9 @@
-#include "config.h"
+#include <xc.h>
 #include "uartConfig.h"
 
 //The GPS uses UART1
+
+
 
 void _ISR _U1RXInterrupt (void)
 {
@@ -10,7 +12,7 @@ void _ISR _U1RXInterrupt (void)
         putU2(c); 
     }
     
-    //TODO: needs to be a printf
+    //TODO: needs to be a printf?
     
     IFS0bits.U1RXIF = 0 ;   //  clear  interrupt  flag
 
@@ -52,4 +54,11 @@ void InitU2(void) {
     U2MODE = 0x8008; // See data sheet, pg 148. Enable UART2, BRGH = 1,
     // Idle state = 1, 8 data, No parity, 1 Stop bit
     U2STA = 0x0400; // See data sheet, pg. 150, Transmit Enable
+}
+
+char putU2(char c) { // (Transmit)
+    //while (CTS); //wait for !CTS (active low)
+    while (U2STAbits.UTXBF); // Wait if transmit buffer full.
+    U2TXREG = c; // Write value to transmit FIFO
+    return c;
 }
