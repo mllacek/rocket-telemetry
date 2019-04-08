@@ -13,12 +13,12 @@ unsigned int T_REF= 0; //reference temp C5
 unsigned int TEMPSENS= 0; // temp coeff of the temp C6
 
 //TODO
-void SPIStart() {
+void SPIBarStart() {
     PORTBbits.RB2 = 0; // CS Pin Pin 23 //RB2
 
 }
 
-void SPIEnd() {
+void SPIBarEnd() {
     PORTBbits.RB2 = 1; // CS Pin Pin 23 //RB2
 
 }

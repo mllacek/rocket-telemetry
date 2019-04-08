@@ -14,6 +14,20 @@ int main(void) {
     SPI2Init();
     __C30_UART = 2;
     
+    accelerometerInit();
+    accelerometerDetect();
     
+    barSetup();
+    
+    gyroscopeInit();
+    gyroscopeDetect();
+    
+    while(1){
+        ms_delay(100);
+        printGyroscopeData();
+        printPressureAndTemp();
+        printAccelerometerData();
+    }
+
     return 0;
 }

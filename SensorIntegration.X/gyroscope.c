@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <xc.h>
 
-void SPIStart() {
+void SPIGyroStart() {
     PORTBbits.RB2 = 0; // CS Pin Pin 23 //RB2
 }
 
-void SPIEnd() {
+void SPIGyroEnd() {
     PORTBbits.RB2 = 1; // CS Pin Pin 23 //RB2
 }
 
@@ -16,22 +16,22 @@ void gyroscopeInit(void){
     AD1PCFG = 0x04; // Pin RB2 in digital mode
     TRISBbits.TRISB2 = 0; //Setting TRIS Bit to Digital Output
 
-    SPIStart();
+    SPIGyroStart();
     writeSPI2(L3GD20_REGISTER_CTRL_REG1);
     writeSPI2(0x0F);
-    SPIEnd();
-    SPIStart();
+    SPIGyroEnd();
+    SPIGyroStart();
     writeSPI2(L3GD20_REGISTER_CTRL_REG4); //L3DS20_RANGE_2000DPS
     writeSPI2(0x20);
-    SPIEnd();
+    SPIGyroEnd();
 }
 
 void gyroscopeDetect(void){
     int device_ID;
-    SPIStart();
+    SPIGyroStart();
     writeSPI2(L3GD20_REGISTER_WHO_AM_I | 0x80); //Reading From This Register
     device_ID = readSPI1();
-    SPIEnd();
+    SPIGyroEnd();
     printf("Device ID = %x\n", device_ID);
     if (device_ID != 0xD7) {
         printf("The L3GD20 Gyroscope is NOT Detected...\n");
@@ -44,7 +44,7 @@ void printGyroscopeData(void){
     int xlo,xhi,ylo,yhi,zlo,zhi;
     int x,y,z;
     
-    SPIStart();
+    SPIGyroStart();
     writeSPI2(L3GD20_REGISTER_OUT_X_L | 0x80 | 0x40); //Reading Multiple Times From This Register
     us_delay(10); //MAY NEED TO ADJUST, ADD A DELAY 
     xlo = readSPI2();
@@ -53,7 +53,7 @@ void printGyroscopeData(void){
     yhi = readSPI2();
     zlo = readSPI2();
     zhi = readSPI2();
-    SPIEnd();
+    SPIGyroEnd();
 
     // Shift values to create properly formed integer (low byte first)
     x = (xlo | (xhi << 8));
