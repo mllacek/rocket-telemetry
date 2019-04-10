@@ -14,7 +14,7 @@ void _ISR _U1RXInterrupt (void)
         char c = getU1();
         putU2(c);
     }
-    
+   
     IFS0bits.U1RXIF = 0 ;   //  clear  interrupt  flag
 
 }
@@ -51,10 +51,17 @@ void InitU1(void) {
     U1MODE = 0x8008; // See data sheet, pg 148. Enable UART1, BRGH = 1,
     // Idle state = 1, 8 data, No parity, 1 Stop bit
     U1STA = 0x0400; // See data sheet, pg. 150, Transmit Enable
-
+    //U1STAbits.UTXEN = 1;
+    
+    //U1_send_string("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"); //RMC data only
+    
+    U1_send_string("$PMTK314,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"); //GGA data only
+    ms_delay(10);
     U1STAbits.URXISEL=00; //interrupt when a character is received
     IEC0bits.U1RXIE = 1; //Enable Receive Interrupt
-
+     //U1_send_string("$PMTK314,1,1,1,1,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0*2C");
+    //U1_send_string("$PMTK314,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28");
+    //U1_send_string("$PMTK314,1,1,1,1,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0*2C");
     //Putting the UART interrupt flag down.
     IFS0bits.U1RXIF = 0;
 }

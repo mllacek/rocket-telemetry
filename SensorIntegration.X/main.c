@@ -21,19 +21,18 @@ int main(void) {
     TRISBbits.TRISB2 = 0; //Setting TRIS Bit to Digital Output
     PORTBbits.RB2 = 1; // CS Pin Pin 23 //RB2
     
-    //gryo
     TRISGbits.TRISG9 = 0; //Setting TRIS Bit to Digital Output
     PORTGbits.RG9 = 1; // CS Pin Pin 14 //RG9
     
     TRISA = 0x00;
     PORTA = 0x01; //RA0, PIN 17
     
-    //ms_delay(2);
+    ms_delay(2);
     barSetup();
-    //ms_delay(2);
-    //accelerometerInit();
-    //ms_delay(2);
-    //accelerometerDetect();
+    ms_delay(2);
+    accelerometerInit();
+    ms_delay(2);
+    accelerometerDetect();
     
     gyroscopeInit();
     gyroscopeDetect();
@@ -43,8 +42,8 @@ int main(void) {
         printGyroscopeData();
         ms_delay(10);
         printPressureAndTemp();
-        //ms_delay(2);
-        //printAccelerometerData();
+        ms_delay(2);
+        printAccelerometerData();
     }
 
     return 0;

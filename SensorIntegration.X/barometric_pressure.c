@@ -12,24 +12,22 @@ unsigned int TCO= 0; //temp coeff of pressure offset C4
 unsigned int T_REF= 0; //reference temp C5
 unsigned int TEMPSENS= 0; // temp coeff of the temp C6
 
-//TODO
 void SPIBarStart() {
-    PORTA = 0x00;
-
+    PORTGbits.RG9 = 0; // CS Pin Pin 14 //RG9
 }
 
 void SPIBarEnd() {
-    PORTA = 0x01; //RA0, PIN 17
+    PORTGbits.RG9 = 1; // CS Pin Pin 14 //RG9
 
 }
 
 unsigned int read_16bit_PROM(unsigned int address){
     unsigned int x = 0;
     SPIBarStart();
-    writeSPI1(address); //send 8-bit command sequence
+    writeSPI2(address); //send 8-bit command sequence
     
-    unsigned int xHIGH = readSPI1(); //read 8 MSBs
-    unsigned int xLOW = readSPI1();
+    unsigned int xHIGH = readSPI2(); //read 8 MSBs
+    unsigned int xLOW = readSPI2();
     SPIBarEnd();
     
     x = (xLOW | (xHIGH << 8));
@@ -40,15 +38,15 @@ unsigned int read_16bit_PROM(unsigned int address){
 unsigned long read_conversion_data(unsigned int address){
     unsigned long x = 0;
     SPIBarStart();
-    writeSPI1(address); //send 8-bit command sequence
+    writeSPI2(address); //send 8-bit command sequence
     SPIBarEnd();
     
     ms_delay(3);
     SPIBarStart();
-    writeSPI1(0x00);
-    unsigned long xHIGH = readSPI1(); //read 8 MSBs
-    unsigned long xMID = readSPI1();
-    unsigned long xLOW = readSPI1();
+    writeSPI2(0x00);
+    unsigned long xHIGH = readSPI2(); //read 8 MSBs
+    unsigned long xMID = readSPI2();
+    unsigned long xLOW = readSPI2();
     SPIBarEnd();
     
     x = (xLOW | (xMID << 8) | (xHIGH << 16));
@@ -57,8 +55,10 @@ unsigned long read_conversion_data(unsigned int address){
 }
 
 void barSetup(void){
-    //TRISA = 0x00;
-    //SPIBarEnd(); 
+
+    
+        //AD1PCFG = 0x04; // Pin RB2 in digital mode
+    //TRISGbits.TRISG9 = 0; //Setting TRIS Bit to Digital Output
     
     SPIBarStart();
     //read calibration data from PROM

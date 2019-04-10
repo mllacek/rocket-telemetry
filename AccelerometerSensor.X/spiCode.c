@@ -8,7 +8,7 @@
 int registerStatus;
 
 void SPI1Init(void) {
-    SPI1CON1 = 0x0320; // Master Mode, 8-bit bytes, Idle state low, Active Hi
+    SPI1CON1 = 0x0260; // Master Mode, 8-bit bytes, Idle state low, Active Hi
     // Data changes on clock transition from Active to Idle
     // SCL1 at 16000000/(8*64) = 31.25 kHz.
     SPI1STAT = 0x8000; // enable SPI peripheral
