@@ -5,16 +5,16 @@
 #include <xc.h>
 
 void SPIGyroStart() {
-    PORTBbits.RB2 = 0; // CS Pin Pin 23 //RB2
+    PORTGbits.RG9 = 0; // CS Pin Pin 14 //RG9
 }
 
 void SPIGyroEnd() {
-    PORTBbits.RB2 = 1; // CS Pin Pin 23 //RB2
+    PORTGbits.RG9 = 1; // CS Pin Pin 14 //RG9
 }
 
 void gyroscopeInit(void){
-    AD1PCFG = 0x04; // Pin RB2 in digital mode
-    TRISBbits.TRISB2 = 0; //Setting TRIS Bit to Digital Output
+    //AD1PCFG = 0x04; // Pin RB2 in digital mode
+    TRISGbits.TRISG9 = 0; //Setting TRIS Bit to Digital Output
 
     SPIGyroStart();
     writeSPI2(L3GD20_REGISTER_CTRL_REG1);

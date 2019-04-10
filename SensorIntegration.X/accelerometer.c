@@ -15,8 +15,8 @@ void SPIAccEnd() {
 }
 
 void accelerometerInit(void){
-    AD1PCFG = 0x04; // Pin RB2 in digital mode
-    TRISBbits.TRISB2 = 0; //Setting TRIS Bit to Digital Output
+    //AD1PCFG = 0x04; // Pin RB2 in digital mode
+    //TRISBbits.TRISB2 = 0; //Setting TRIS Bit to Digital Output
     SPIAccStart();
     writeSPI1(LIS3DH_REG_CTRL1);
     writeSPI1(0xF7);

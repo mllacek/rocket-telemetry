@@ -11,23 +11,40 @@
 int main(void) {
    
     InitU2();
+    InitU1();
     SPI1Init();
     SPI2Init();
     __C30_UART = 2;
     
-    accelerometerInit();
-    accelerometerDetect();
+    AD1PCFG = 0xFF; // Pins to digital
+     
+    TRISBbits.TRISB2 = 0; //Setting TRIS Bit to Digital Output
+    PORTBbits.RB2 = 1; // CS Pin Pin 23 //RB2
     
+    //gryo
+    TRISGbits.TRISG9 = 0; //Setting TRIS Bit to Digital Output
+    PORTGbits.RG9 = 1; // CS Pin Pin 14 //RG9
+    
+    TRISA = 0x00;
+    PORTA = 0x01; //RA0, PIN 17
+    
+    //ms_delay(2);
     barSetup();
+    //ms_delay(2);
+    //accelerometerInit();
+    //ms_delay(2);
+    //accelerometerDetect();
     
     gyroscopeInit();
     gyroscopeDetect();
-    
+
     while(1){
-        ms_delay(100);
+        ms_delay(1000);
         printGyroscopeData();
+        ms_delay(10);
         printPressureAndTemp();
-        printAccelerometerData();
+        //ms_delay(2);
+        //printAccelerometerData();
     }
 
     return 0;

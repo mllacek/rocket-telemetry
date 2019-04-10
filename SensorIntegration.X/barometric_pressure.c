@@ -33,7 +33,7 @@ unsigned int read_16bit_PROM(unsigned int address){
     SPIBarEnd();
     
     x = (xLOW | (xHIGH << 8));
-    
+    printf("Data: %lu\n", x);
     return x;
 }
 
@@ -43,7 +43,7 @@ unsigned long read_conversion_data(unsigned int address){
     writeSPI1(address); //send 8-bit command sequence
     SPIBarEnd();
     
-    ms_delay(2);
+    ms_delay(3);
     SPIBarStart();
     writeSPI1(0x00);
     unsigned long xHIGH = readSPI1(); //read 8 MSBs
@@ -52,13 +52,13 @@ unsigned long read_conversion_data(unsigned int address){
     SPIBarEnd();
     
     x = (xLOW | (xMID << 8) | (xHIGH << 16));
-    
+
     return x;
 }
 
 void barSetup(void){
-    TRISA = 0x00;
-    SPIBarEnd(); 
+    //TRISA = 0x00;
+    //SPIBarEnd(); 
     
     SPIBarStart();
     //read calibration data from PROM

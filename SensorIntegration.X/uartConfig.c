@@ -12,8 +12,6 @@ void _ISR _U1RXInterrupt (void)
         putU2(c); 
     }
     
-    //TODO: needs to be a printf?
-    
     IFS0bits.U1RXIF = 0 ;   //  clear  interrupt  flag
 
 }
@@ -28,7 +26,9 @@ void InitU1(void) {
     U1MODE = 0x8008; // See data sheet, pg 148. Enable UART1, BRGH = 1,
     // Idle state = 1, 8 data, No parity, 1 Stop bit
     U1STA = 0x0400; // See data sheet, pg. 150, Transmit Enable
-
+    
+    U1_send_string("$PMTK314,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"); //GGA data only
+    
     U1STAbits.URXISEL=00; //interrupt when a character is received
     IEC0bits.U1RXIE = 1; //Enable Receive Interrupt
 
@@ -61,4 +61,10 @@ char putU2(char c) { // (Transmit)
     while (U2STAbits.UTXBF); // Wait if transmit buffer full.
     U2TXREG = c; // Write value to transmit FIFO
     return c;
+}
+
+void U1_send_string(char* st_pt)
+{
+    while(*st_pt) //if there is a char
+        putU1(*st_pt++);//process it as a byte data
 }
