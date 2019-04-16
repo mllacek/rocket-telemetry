@@ -1,19 +1,76 @@
 #include <xc.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdint.h>
 #include "uartConfig.h"
+#include <stdbool.h>
 
+#include <string.h>
+
+uint8_t s_buffer[256];           // sentence buffer to save GPRMC data
+volatile uint8_t cntr = 0;       // buffer index
+
+volatile uint8_t gprmc = 0;      // flag to indicate GPRMC sentence
+uint8_t rdy = 0;                 // flag to indicate if the s_buffer is ready to be processed
+
+uint8_t msg_id[6];      // buffer to save msg ID, which will be 5 bytes long
+uint8_t id_cntr = 6;    // buffer index
+    
 //The GPS uses UART1
-
-
 
 void _ISR _U1RXInterrupt (void)
 {
+    
     if (IEC0bits.U1RXIE && IFS0bits.U1RXIF){
-        char c = getU1();
-        putU2(c); 
+        
+        char _char = getU1();         // temp variable to read next byte
+        if(gprmc) {                                  // collect sentence data
+            if(_char == '\r') {                      // until '\r' is read
+                cntr = 0;                            // then reset buffer index
+                gprmc = 0;
+                rdy = 1;
+                // and reset GPRMC indication
+            } else {
+                s_buffer[cntr++] = _char;            // store GPRMC sentence data
+                //rdy = 1;                             // buffer ready to be processed
+            }
+        }
+
+        if(id_cntr < 6) {                            // a '$' was received
+            msg_id[id_cntr++] = _char;               // collect msg ID
+
+            if(id_cntr == 5) {
+                msg_id[id_cntr] = 0;                 // add terminating null
+
+                if(strncmp(msg_id, "GPGGA", 5) == 0){// check for GPRMC
+                    gprmc = 1;                       // indicate GPRMC sentence
+                }
+            }
+        }
+
+        if(_char == '$'){                            // wait for '$' to capture the msg ID
+            id_cntr = 0;
+        }
+
     }
     
     IFS0bits.U1RXIF = 0 ;   //  clear  interrupt  flag
+}
 
+void printGpsData(){
+    printf("GPS:");
+    if (rdy == 1){
+            printf(s_buffer);
+    }
+    printf("\n");
+}
+
+
+void append(char* s, char c)
+{
+        int len = strlen(s);
+        s[len] = c;
+        s[len+1] = '\0';
 }
 
 void InitU1(void) {

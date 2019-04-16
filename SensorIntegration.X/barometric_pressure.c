@@ -31,7 +31,7 @@ unsigned int read_16bit_PROM(unsigned int address){
     SPIBarEnd();
     
     x = (xLOW | (xHIGH << 8));
-    printf("Data: %lu\n", x);
+    //printf("Data: %lu\n", x);
     return x;
 }
 

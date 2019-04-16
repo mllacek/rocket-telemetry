@@ -44,6 +44,8 @@ int main(void) {
         printPressureAndTemp();
         ms_delay(2);
         printAccelerometerData();
+        ms_delay(2);
+        printGpsData();
     }
 
     return 0;
