@@ -40,12 +40,13 @@ int main(void) {
     while(1){
         ms_delay(1000);
         printGyroscopeData();
-        ms_delay(10);
+        ms_delay(2);
         printPressureAndTemp();
         ms_delay(2);
         printAccelerometerData();
         ms_delay(2);
         printGpsData();
+        printf("\n");
     }
 
     return 0;

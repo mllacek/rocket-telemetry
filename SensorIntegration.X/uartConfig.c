@@ -7,32 +7,28 @@
 
 #include <string.h>
 
-uint8_t s_buffer[256];           // sentence buffer to save GPRMC data
+uint8_t gps_buffer[256];           // sentence buffer to save GPRMC data
 volatile uint8_t cntr = 0;       // buffer index
-
-volatile uint8_t gprmc = 0;      // flag to indicate GPRMC sentence
-uint8_t rdy = 0;                 // flag to indicate if the s_buffer is ready to be processed
-
+volatile uint8_t gpgga = 0;      // flag to indicate GPRMC sentence
 uint8_t msg_id[6];      // buffer to save msg ID, which will be 5 bytes long
 uint8_t id_cntr = 6;    // buffer index
     
+const char delims[] = ",";
+
 //The GPS uses UART1
 
 void _ISR _U1RXInterrupt (void)
 {
-    
     if (IEC0bits.U1RXIE && IFS0bits.U1RXIF){
         
         char _char = getU1();         // temp variable to read next byte
-        if(gprmc) {                                  // collect sentence data
+        if(gpgga) {                                  // collect sentence data
             if(_char == '\r') {                      // until '\r' is read
                 cntr = 0;                            // then reset buffer index
-                gprmc = 0;
-                rdy = 1;
-                // and reset GPRMC indication
+                gpgga = 0;
+                // and reset GPGGA indication
             } else {
-                s_buffer[cntr++] = _char;            // store GPRMC sentence data
-                //rdy = 1;                             // buffer ready to be processed
+                gps_buffer[cntr++] = _char;            // store GPRMC sentence data
             }
         }
 
@@ -43,7 +39,7 @@ void _ISR _U1RXInterrupt (void)
                 msg_id[id_cntr] = 0;                 // add terminating null
 
                 if(strncmp(msg_id, "GPGGA", 5) == 0){// check for GPRMC
-                    gprmc = 1;                       // indicate GPRMC sentence
+                    gpgga = 1;                       // indicate GPRMC sentence
                 }
             }
         }
@@ -58,13 +54,18 @@ void _ISR _U1RXInterrupt (void)
 }
 
 void printGpsData(){
-    printf("GPS:");
-    if (rdy == 1){
-            printf(s_buffer);
-    }
-    printf("\n");
+    const char *s = gps_buffer; //copy gps buffer
+    int field_count = 0;
+    do {
+        size_t field_len = strcspn(s, delims);
+        if (field_count >= 2 && field_count < 5) //fields 2 through 5
+            printf("%.*s,", (int)field_len, s);
+        if (field_count == 5)
+            printf("%.*s", (int)field_len, s);
+        s += field_len;
+        field_count++;
+    } while (*s++);
 }
-
 
 void append(char* s, char c)
 {

@@ -103,8 +103,10 @@ void printPressureAndTemp()
     double d_temp = TEMP/100.0;
     double d_pressure = P/100.0;
     
-    printf("Temp (degrees C): %.2f\n", d_temp);
-    printf("Pressure: (mbar): %.2f\n", d_pressure);
+    //degrees C
+    printf("%.2f,", d_temp);
+    //pressure in mbar
+    printf("%.2f,", d_pressure);
 }
 
 

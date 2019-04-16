@@ -65,5 +65,5 @@ void printGyroscopeData(void){
     y *= L3GD20_SENSITIVITY_2000DPS;
     z *= L3GD20_SENSITIVITY_2000DPS;
         
-    printf("X=%d, Y=%d, Z=%d\n", x, y, z);
+    printf("%d,%d,%d,", x, y, z);
 }

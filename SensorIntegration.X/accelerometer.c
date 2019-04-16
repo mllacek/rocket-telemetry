@@ -52,6 +52,6 @@ void printAccelerometerData(void) {
     z = readSPI1();
     z |= readSPI1() << 8;
     SPIAccEnd();
-    printf("X=%d, Y=%d, Z=%d\n", x, y, z);
+    printf("%d,%d,%d,", x, y, z);
 }
 
