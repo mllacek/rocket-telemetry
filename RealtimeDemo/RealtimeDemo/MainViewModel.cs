@@ -21,17 +21,22 @@ namespace RealtimeDemo
     public class MainViewModel : INotifyPropertyChanged, IDisposable
     {
         // try to change might be lower or higher than the rendering interval
-        private const int UpdateInterval = 20;
+        private const int UpdateInterval = 30;
 
         private bool disposed;
         private readonly Timer timer;
         private readonly Stopwatch watch = new Stopwatch();
         private Thread readThread = new Thread(Update);
-        private static PlotModel plot = new PlotModel();
-        private static List<double> data = new List<double>();
+        private static PlotModel tempPlot = new PlotModel();
+        private static PlotModel pressurePlot = new PlotModel();
         private static bool _continue = true;
-        public PlotModel PlotModel { get; private set; }
-        public double Average { get; private set; }
+        public PlotModel TempPlotModel { get; private set; }
+        public PlotModel PressurePlotModel { get; private set; }
+        public static double tempSum = 0;
+        public static double pressureSum = 0;
+        public static int count = 0;
+        public double TempAverage { get; private set; }
+        public double PressureAverage { get; private set; }
 
 
         public MainViewModel()
@@ -54,17 +59,24 @@ namespace RealtimeDemo
         {
             this.timer.Change(Timeout.Infinite, Timeout.Infinite);
 
-            plot.Axes.Add(new LinearAxis { Position = AxisPosition.Left });
+            tempPlot.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title="Temperature (degrees C)" });
+            tempPlot.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = "Time (sec)" });
+            tempPlot.Series.Add(new LineSeries { LineStyle = LineStyle.Solid});
+            TempPlotModel = tempPlot;
 
-            plot.Series.Add(new LineSeries { LineStyle = LineStyle.Solid });
+            pressurePlot.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = "Pressure (mBar)" });
+            pressurePlot.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = "Time (sec)" });
+            pressurePlot.Series.Add(new LineSeries { LineStyle = LineStyle.Solid });
+            PressurePlotModel = pressurePlot;
 
-            PlotModel = plot;
-            Average = 0;
+            TempAverage = 0;
+            PressureAverage = 0;
 
             SelectedPath = String.Empty;
             this.watch.Start();
 
-            this.RaisePropertyChanged("PlotModel");
+            this.RaisePropertyChanged("TempPlotModel");
+            this.RaisePropertyChanged("PressurePlotModel");
 
             this.timer.Change(1000, UpdateInterval);
 
@@ -88,24 +100,24 @@ namespace RealtimeDemo
 
         private void OnTimerElapsed(object state)
         {
-            PlotModel = plot;
-            PlotModel.InvalidatePlot(true);
+            TempPlotModel = tempPlot;
+            TempPlotModel.InvalidatePlot(true);
 
-            double sum = 0;
-            foreach (var d in data)
+            PressurePlotModel = pressurePlot;
+            PressurePlotModel.InvalidatePlot(true);
+
+            TempAverage = 0;
+            PressureAverage = 0;
+
+            if (count > 0)
             {
-                sum += d;
-            }
-            if (data.Count > 0)
-            {
-                Average = sum / data.Count;
-            }
-            else
-            {
-                Average = 0;
+                TempAverage = tempSum / count;
+                PressureAverage = pressureSum / count;
             }
 
-            this.RaisePropertyChanged("Average");
+
+            this.RaisePropertyChanged("TempAverage");
+            this.RaisePropertyChanged("PressureAverage");
         }
 
         private static void Update()
@@ -114,7 +126,8 @@ namespace RealtimeDemo
             {
                 if (_selectedPath != String.Empty)
                 {
-                    plot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid }; //Remove old data
+                    tempPlot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid}; //Remove old data
+                    pressurePlot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid };
 
                     var wh = new AutoResetEvent(false);
                     var fsw = new FileSystemWatcher(".");
@@ -130,14 +143,23 @@ namespace RealtimeDemo
                         while (_continue)
                         {
                             message = sr.ReadLine();
-                            if (message != null)
+                            if (message != null && message[0] == '$')
                             {
-                                rocketData data = ParseData(message);
-                                var s = (LineSeries)plot.Series[0];
-                                double x = s.Points.Count > 0 ? s.Points[s.Points.Count - 1].X + 1 : 0;
-                                data.Add(Convert.ToDouble(message));
-                                s.Points.Add(new DataPoint(x, Convert.ToDouble(message)));
-                                plot.Series[0] = s;
+                                RocketData rd = MainViewModel.ParseData(message);
+                                var tempSeries = (LineSeries)tempPlot.Series[0];
+                                var pressureSeries = (LineSeries)pressurePlot.Series[0];
+
+                                int milliseconds = rd.Min * 60 + rd.Sec + rd.Msec/1000;
+
+                                count++;
+                                tempSum += rd.Temp;
+                                pressureSum += rd.Pressure;
+
+                                tempSeries.Points.Add(new DataPoint(milliseconds, rd.Temp));
+                                tempPlot.Series[0] = tempSeries;
+
+                                pressureSeries.Points.Add(new DataPoint(milliseconds, rd.Pressure));
+                                pressurePlot.Series[0] = pressureSeries;
 
                             }
                             else
@@ -150,7 +172,7 @@ namespace RealtimeDemo
             
         }
 
-        public class rocketData
+        public class RocketData
         {
             public int Min { get; set; }
             public int Sec { get; set; }
@@ -167,8 +189,11 @@ namespace RealtimeDemo
             public int AccelY { get; set; }
             public int AccelZ { get; set; }
 
-            public rocketData(int Min, int Sec, int Msec, int gx, int gy, int gz, double p, double t, int ax, int ay, int az)
+            public RocketData(int m, int s, int ms, int gx, int gy, int gz, double p, double t, int ax, int ay, int az)
             {
+                Min = m;
+                Sec = s;
+                Msec = ms;
                 GyroX = gx;
                 GyroY = gy;
                 GyroZ = gz;
@@ -181,9 +206,51 @@ namespace RealtimeDemo
 
         }
 
-        private rocketData ParseData(string message)
+        //sample message format
+        //$3:0.706,0,-3,-1,21.74,961.71,-96,-32,7856,4104.5615,N,08130.8343,W
+        public static RocketData ParseData(string message)
         {
-            rocketData parsedData = new rocketData();
+            var data = message.Split(',');
+            var time = data[0].TrimStart(new char[] { '$' });
+
+            if (!int.TryParse(time.Split(':')[0], out int Min))
+                Min = 0;
+
+            time = time.Split(':')[1];
+
+            if (!int.TryParse(time.Split('.')[0], out int Sec))
+                Sec = 0;
+
+            if (!int.TryParse(time.Split('.')[1], out int Msec))
+                Msec = 0;
+
+            if (!int.TryParse(data[1], out int GyroX))
+                GyroX = 0;
+
+            if (!int.TryParse(data[2], out int GyroY))
+                GyroY = 0;
+
+            if (!int.TryParse(data[3], out int GyroZ))
+                GyroZ = 0;
+
+            if (!double.TryParse(data[4], out double Temp))
+                Temp = 0.0;
+
+            if (!double.TryParse(data[5], out double Pressure))
+                Pressure = 0.0;
+
+            if (!int.TryParse(data[6], out int AccelX))
+                AccelX = 0;
+
+            if (!int.TryParse(data[7], out int AccelY))
+                AccelY = 0;
+
+            if (!int.TryParse(data[8], out int AccelZ))
+                AccelZ = 0;
+
+            //we can ignore the gps data for this application
+
+            RocketData parsedData = new RocketData(Min, Sec, Msec, GyroX, GyroY, GyroZ, Pressure, Temp, AccelX, AccelY,AccelZ);
 
             return parsedData;
         }

@@ -8,10 +8,13 @@
         <StackPanel Orientation="Vertical" Margin="10">
             <StackPanel Orientation="Horizontal">
                 <Button Name="btnOpenFile" Command="{Binding ButtonCommand}" Width="100">Choose File</Button>
-                <Label>Average:</Label>
-                <TextBox Text="{Binding Average, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
+                <Label>Average Temperature (degrees C):</Label>
+                <TextBox Text="{Binding TempAverage, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
+                <Label>Average Pressure (mBar):</Label>
+                <TextBox Text="{Binding PressureAverage, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
             </StackPanel>
-            <oxy:PlotView x:Name="plot1" Model="{Binding PlotModel}" Width="600" Height="400"/>
+            <oxy:PlotView x:Name="plot1" Model="{Binding TempPlotModel}" Width="500" Height="300"/>
+            <oxy:PlotView x:Name="plot2" Model="{Binding PressurePlotModel}" Width="500" Height="300"/>
         </StackPanel>
     </DockPanel>
 </Window>
