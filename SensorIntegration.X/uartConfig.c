@@ -24,6 +24,7 @@ void _ISR _U1RXInterrupt (void)
         char _char = getU1();         // temp variable to read next byte
         if(gpgga) {                                  // collect sentence data
             if(_char == '\r') {                      // until '\r' is read
+                gps_buffer[cntr] = '\0'; //add terminating null
                 cntr = 0;                            // then reset buffer index
                 gpgga = 0;
                 // and reset GPGGA indication
@@ -36,7 +37,7 @@ void _ISR _U1RXInterrupt (void)
             msg_id[id_cntr++] = _char;               // collect msg ID
 
             if(id_cntr == 5) {
-                msg_id[id_cntr] = 0;                 // add terminating null
+                msg_id[id_cntr] = '\0';                 // add terminating null
 
                 if(strncmp(msg_id, "GPGGA", 5) == 0){// check for GPRMC
                     gpgga = 1;                       // indicate GPRMC sentence
@@ -53,25 +54,26 @@ void _ISR _U1RXInterrupt (void)
     IFS0bits.U1RXIF = 0 ;   //  clear  interrupt  flag
 }
 
-void printGpsData(){
+void printGpsData(char* message){
     const char *s = gps_buffer; //copy gps buffer
     int field_count = 0;
+    sprintf(message, "");
     do {
         size_t field_len = strcspn(s, delims);
-        if (field_count >= 2 && field_count < 5) //fields 2 through 5
-            printf("%.*s,", (int)field_len, s);
-        if (field_count == 5)
-            printf("%.*s", (int)field_len, s);
+        if (field_count >= 2 && field_count < 5){ //fields 2 through 5
+            //printf("%.*s,", (int)field_len, s);
+            sprintf(message + strlen(message), "%.*s,", (int)field_len, s);
+        }
+        if (field_count == 5) {
+            //printf("%.*s", (int)field_len, s);
+            sprintf(message + strlen(message), "%.*s", (int)field_len, s);
+        }
+        //GPS altitude
+        //if (field_count == 9)
+         //   printf(",%.*s", (int)field_len, s);
         s += field_len;
         field_count++;
     } while (*s++);
-}
-
-void append(char* s, char c)
-{
-        int len = strlen(s);
-        s[len] = c;
-        s[len+1] = '\0';
 }
 
 void InitU1(void) {

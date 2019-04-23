@@ -9,7 +9,7 @@
 #define	BAROMETRIC_PRESSURE_H
 
 void barSetup(void);
-void printPressureAndTemp(void);
+void printPressureAndTemp(char*);
 
 #endif	/* BAROMETRIC_PRESSURE_H */
 

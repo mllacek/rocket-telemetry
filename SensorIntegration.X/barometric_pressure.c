@@ -71,7 +71,7 @@ void barSetup(void){
     SPIBarEnd();
 }
 
-void printPressureAndTemp()
+void printPressureAndTemp(char* message)
 {
     //Read digital pressure and temp data
     unsigned long D1 = read_conversion_data(0x42); //digital pressure value  
@@ -104,9 +104,11 @@ void printPressureAndTemp()
     double d_pressure = P/100.0;
     
     //degrees C
-    printf("%.2f,", d_temp);
+    //printf("%.2f,", d_temp);
     //pressure in mbar
-    printf("%.2f,", d_pressure);
+    //printf("%.2f,", d_pressure);
+    
+    sprintf(message,"%.2f,%.2f,", d_temp, d_pressure);
 }
 
 

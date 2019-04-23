@@ -40,7 +40,7 @@ void gyroscopeDetect(void){
     }
 }
 
-void printGyroscopeData(void){
+void printGyroscopeData(char* message){
     int xlo,xhi,ylo,yhi,zlo,zhi;
     int x,y,z;
     
@@ -65,5 +65,6 @@ void printGyroscopeData(void){
     y *= L3GD20_SENSITIVITY_2000DPS;
     z *= L3GD20_SENSITIVITY_2000DPS;
         
-    printf("%d,%d,%d,", x, y, z);
+    //printf("%d,%d,%d,", x, y, z);
+    sprintf(message, "%d,%d,%d,", x, y, z);
 }

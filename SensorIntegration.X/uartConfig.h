@@ -7,7 +7,7 @@
 
 #ifndef UARTCONFIG_H
 #define	UARTCONFIG_H
-void printGpsData();
+void printGpsData(char*);
 void append(char* s, char c);
 void InitU1(void);
 char putU1(char c);

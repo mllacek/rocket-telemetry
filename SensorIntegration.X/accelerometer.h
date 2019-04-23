@@ -49,7 +49,7 @@
 
 void accelerometerInit(void);
 void accelerometerDetect(void);
-void printAccelerometerData(void);
+void printAccelerometerData(char*);
 
 #endif	/* ACCELEROMETER_H */
 

@@ -4,6 +4,7 @@
 #include "accelerometer.h"
 #include "barometric_pressure.h"
 #include "config.h"
+#include <string.h>
 
 #include <libpic30.h>
 #include <stdio.h>
@@ -37,10 +38,18 @@ void TimerSetup(){
     _T1IE = 1; // enable the T1 interrupt source
 }
 
-void printTime(){
-    printf("%d:%d.%d,", Min,Sec, mSec);
+void append(char* s, char c)
+{
+        int len = strlen(s);
+        s[len] = c;
+        s[len+1] = '\0';
 }
 
+void printTime(char* message){
+    //printf("%d:%d.%d,", Min,Sec, mSec);
+    sprintf(message, "$%d:%d.%d,", Min, Sec, mSec);  
+}
+       
 int main(void) {
    
     TimerSetup();
@@ -72,14 +81,31 @@ int main(void) {
     //gyroscopeDetect();
 
     while(1){
-        ms_delay(1000);
-        printf("$");
-        printTime();
-        printGyroscopeData();
-        printPressureAndTemp();
-        printAccelerometerData();
-        printGpsData();
-        printf("\n");
+        //ms_delay(50);
+        
+        char time[20];
+        char gyro[20];
+        char pt[20];
+        char accel[20];
+        char gps[50];
+        
+        printTime(time);
+        printGyroscopeData(gyro);
+        printPressureAndTemp(pt);
+        printAccelerometerData(accel);
+        printGpsData(gps);
+        
+        char mssg[500];
+        sprintf(mssg, "");
+        sprintf(mssg + strlen(mssg), time);
+        sprintf(mssg + strlen(mssg), gyro);
+        sprintf(mssg + strlen(mssg), pt);
+        sprintf(mssg + strlen(mssg), accel);
+        sprintf(mssg + strlen(mssg), gps);
+        sprintf(mssg + strlen(mssg), "\n");
+        
+        printf(mssg);
+        //TODO: ready to transmit
     }
 
     return 0;

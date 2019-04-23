@@ -41,7 +41,7 @@ void accelerometerDetect(void){
     }
 }
 
-void printAccelerometerData(void) {
+void printAccelerometerData(char* message) {
     int x,y,z;
     SPIAccStart();
     writeSPI1(LIS3DH_REG_OUT_X_L | 0x80 | 0x40); //Reading Multiple Times From This Register
@@ -52,6 +52,7 @@ void printAccelerometerData(void) {
     z = readSPI1();
     z |= readSPI1() << 8;
     SPIAccEnd();
-    printf("%d,%d,%d,", x, y, z);
+    //printf("%d,%d,%d,", x, y, z);
+    sprintf(message, "%d,%d,%d,", x, y, z);  
 }
 

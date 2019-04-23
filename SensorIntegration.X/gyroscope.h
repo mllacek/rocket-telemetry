@@ -48,7 +48,7 @@
 
 void gyroscopeInit(void);
 void gyroscopeDetect(void);
-void printGyroscopeData(void);
+void printGyroscopeData(char*);
 
 #endif	/* GYROSCOPE_H */
 
