@@ -26,9 +26,9 @@ unsigned char readSPI1(void) {
     return SPI1BUF; // Read the received value
 }// writeSPI1
 
-//Gyro uses SPI2 with the setting 0x0320
+//Bar pressure uses SPI2 with the setting 0x0320
 void SPI2Init(void) {
-    SPI2CON1 = 0x0320; // Master Mode, 8-bit bytes, Idle state low, Active Hi
+    SPI2CON1 = 0x0120; // Master Mode, 8-bit bytes, Idle state low, Active Hi
     // Data changes on clock transition from Active to Idle
     // SCL1 at 16000000/(8*64) = 31.25 kHz.
     SPI2STAT = 0x8000; // enable SPI peripheral
