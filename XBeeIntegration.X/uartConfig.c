@@ -20,7 +20,7 @@ const char delims[] = ",";
 void _ISR _U1RXInterrupt (void)
 {
     if (IEC0bits.U1RXIE && IFS0bits.U1RXIF){
-        
+        //Adapted from : https://electronics.stackexchange.com/questions/258189/process-and-store-gps-data-on-mcu
         char _char = getU1();         // temp variable to read next byte
         if(gpgga) {                                  // collect sentence data
             if(_char == '\r') {                      // until '\r' is read
