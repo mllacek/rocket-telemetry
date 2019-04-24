@@ -9,6 +9,11 @@
 #include <libpic30.h>
 #include <stdio.h>
 
+#define MaxMsgSize 100
+
+int message[MaxMsgSize];
+int MsgLength = 0;
+
 int mSec = 0, Sec = 0, Min = 0; // Global variables
 
 void _ISR _T1Interrupt(void) {
@@ -42,9 +47,143 @@ void printTime(char* message){
     //printf("%d:%d.%d,", Min,Sec, mSec);
     sprintf(message, "$%d:%d.%d,", Min, Sec, mSec);  
 }
+
+void SPIStart() {
+    PORTGbits.RG9 = 0;
+}
+
+void SPIEnd() {
+    PORTGbits.RG9 = 1; 
+}
+
+struct TxFrame {
+    int StartDelim; // Start Delimiter
+    int LengthMSB; //Length MSB, Equals total number of bytes in Frame data fields
+    int LengthLSB; //Length LSB
+    int API_Id; //API Identifier, Transmit request frame
+    int Frame_ID; //cmdData, Frame ID
+    int Dest_64bit_1; //cmdData, begin 64 bit destination, currently set to broadcast
+    int Dest_64bit_2;
+    int Dest_64bit_3;
+    int Dest_64bit_4;
+    int Dest_64bit_5;
+    int Dest_64bit_6;
+    int Dest_64bit_7;
+    int Dest_64bit_8; //cmdData end 64 bit destination
+    int Reserved_1; //cmdData, Reserved
+    int Reserved_2; //cmdData, Reserved
+    int BrdCst_Rad; //cmdData, Broadcast radius
+    int TxOptions; //cmdData, Transmit options, P2MP
+    //Start message here
+    int MsgBytes[MaxMsgSize];
+    //End message here
+    int Checksum; //Checksum, Add API_Id through MessByte_n, subtract least significant 8 bits from 0xFF
+};
+
+void SetMsgLength(int length)
+{
+    if((length <= MaxMsgSize)||(length >= 0))
+    {
+        MsgLength = length;
+    }
+}
+
+void TxSend(struct TxFrame frame) {
+    SPIStart();
+    writeSPI2(frame.StartDelim); //Start
+    writeSPI2(frame.LengthMSB); //Length MSB, Equals total number of bytes in Frame data fields
+    writeSPI2(frame.LengthLSB); //Length LSB
+
+    //Frame data fields
+    writeSPI2(frame.API_Id); //API Identifier, Transmit request frame
+    writeSPI2(frame.Frame_ID); //cmdData, Frame ID
+    writeSPI2(frame.Dest_64bit_1); //cmdData, begin 64 bit destination, currently set to broadcast
+    writeSPI2(frame.Dest_64bit_2); //cmdData
+    writeSPI2(frame.Dest_64bit_3); //cmdData
+    writeSPI2(frame.Dest_64bit_4); //cmdData
+    writeSPI2(frame.Dest_64bit_5); //cmdData
+    writeSPI2(frame.Dest_64bit_6); //cmdData
+    writeSPI2(frame.Dest_64bit_7); //cmdData
+    writeSPI2(frame.Dest_64bit_8); //cmdData end 64 bit destination
+    writeSPI2(frame.Reserved_1); //cmdData, Reserved
+    writeSPI2(frame.Reserved_2); //cmdData, Reserved
+    writeSPI2(frame.BrdCst_Rad); //cmdData, Broadcast radius
+    writeSPI2(frame.TxOptions); //cmdData, Transmit options, P2MP
+    //Start message here
+    int i = 0;
+    for(i = 0; i < frame.LengthLSB - 14; i++)
+    {
+        writeSPI2(frame.MsgBytes[i]);
+    }
+    //End message here
+    //End Frame data fields
+    writeSPI2(frame.Checksum); //Checksum
+    SPIEnd();
+    SetMsgLength(0);
+}
+
+struct TxFrame BuildFrame(struct TxFrame frame) {
+    frame.StartDelim = 0x7E; // Start Delimiter
+    frame.LengthMSB = 0x00; //Length MSB, Equals total number of bytes in Frame data fields
+    frame.LengthLSB = MsgLength + 14; //Length LSB
+    frame.API_Id = 0x10; //API Identifier, Transmit request frame
+    frame.Frame_ID = 0x01; //cmdData, Frame ID
+    frame.Dest_64bit_1 = 0x00; //cmdData, begin 64 bit destination, currently set to broadcast
+    frame.Dest_64bit_2 = 0x13;
+    frame.Dest_64bit_3 = 0xA2;
+    frame.Dest_64bit_4 = 0x00;
+    frame.Dest_64bit_5 = 0x41;
+    frame.Dest_64bit_6 = 0x90;
+    frame.Dest_64bit_7 = 0x91;
+    frame.Dest_64bit_8 = 0x5D; //cmdData end 64 bit destination
+    frame.Reserved_1 = 0xFF; //cmdData, Reserved
+    frame.Reserved_2 = 0xFE; //cmdData, Reserved
+    frame.BrdCst_Rad = 0x00; //cmdData, Broadcast radius
+    frame.TxOptions = 0x40; //cmdData, Transmit options, P2MP
+    //Start message here
+    int i = 0;
+    for(i = 0; i < frame.LengthLSB - 14; i++)
+    {
+        frame.MsgBytes[i] = message[i];
+    }
+    //End message here
+    frame.Checksum = evalCheckSum(frame); //Checksum, Add API_Id through MessByte_n, subtract least significant 8 bits from 0xFF
+
+    return frame;
+}
+
+int evalCheckSum(struct TxFrame frame) {
+    int sum = 0;
+    int checksum = 0;
+    int msgsum = 0;
+    int i = 0;
+    for(i = 0; i < frame.LengthLSB - 14; i++)
+    {
+        msgsum = msgsum + frame.MsgBytes[i];
+    }
+    sum = frame.API_Id + frame.Frame_ID + frame.Dest_64bit_1 + frame.Dest_64bit_2 
+            + frame.Dest_64bit_3 + frame.Dest_64bit_4 + frame.Dest_64bit_5 + 
+            frame.Dest_64bit_6 + frame.Dest_64bit_7 + frame.Dest_64bit_8 + 
+            frame.Reserved_1 + frame.Reserved_2 + frame.BrdCst_Rad + frame.TxOptions
+            + msgsum;
+    sum = sum & 0xFF;
+    checksum = 0xFF - sum;
+    return checksum;
+}
+
+void SetMsg(char* msg, int msgLen)
+{
+    int i = 0;
+    for(i = 0; i < msgLen; i++)
+    {
+        message[i] = msg[i];
+    }
+    SetMsgLength(msgLen); 
+}
        
 int main(void) {
-   
+    struct TxFrame tx_frame;
+       
     TimerSetup();
     InitU2();
     InitU1();
@@ -57,6 +196,11 @@ int main(void) {
     TRISBbits.TRISB2 = 0; //Setting TRIS Bit to Digital Output
     PORTBbits.RB2 = 1; // CS Pin Pin 23 //RB2
     
+    //bar pressure
+    TRISBbits.TRISB1 = 0; //Setting TRIS bit to digital output
+    PORTBbits.RB1 = 1;
+    
+    //Xbee
     TRISGbits.TRISG9 = 0; //Setting TRIS Bit to Digital Output
     PORTGbits.RG9 = 1; // CS Pin Pin 14 //RG9
     
@@ -98,7 +242,17 @@ int main(void) {
         sprintf(mssg + strlen(mssg), "\n");
         
         printf(mssg);
-        //TODO: ready to transmit
+        printf("Length:%d", strlen(mssg));
+        
+        SetMsg(mssg, strlen(mssg));
+        //SetMsg("Groupon",7);
+        tx_frame = BuildFrame(tx_frame);
+        TxSend(tx_frame);
+        ms_delay(250);
+        //ms_delay(500);
+        //
+        //printf("Packet Sent\n");
+                
     }
 
     return 0;

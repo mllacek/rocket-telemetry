@@ -13,12 +13,13 @@ unsigned int T_REF= 0; //reference temp C5
 unsigned int TEMPSENS= 0; // temp coeff of the temp C6
 
 void SPIBarStart() {
-    PORTGbits.RG9 = 0; // CS Pin Pin 14 //RG9
+    //PORTGbits.RG9 = 0; // CS Pin Pin 14 //RG9
+    PORTBbits.RB1 = 0;
 }
 
 void SPIBarEnd() {
-    PORTGbits.RG9 = 1; // CS Pin Pin 14 //RG9
-
+    //PORTGbits.RG9 = 1; // CS Pin Pin 14 //RG9
+    PORTBbits.RB1 = 1;
 }
 
 unsigned int read_16bit_PROM(unsigned int address){
