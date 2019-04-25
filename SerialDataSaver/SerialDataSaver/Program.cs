@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Ports;
-using System.Threading;
 
 public class SerialDataSaver
 {
@@ -14,7 +13,7 @@ public class SerialDataSaver
 
         serialPort.PortName = SetPortName(serialPort.PortName);
 
-        fileName = SetFileName("SavedData.txt");
+        fileName = SetFileName("SavedGPSData.txt");
 
         serialPort.BaudRate = 9600;
         serialPort.Parity = Parity.None;
@@ -28,13 +27,15 @@ public class SerialDataSaver
 
         serialPort.Open();
 
-        while(true)
+        while (true)
         {
             try
             {
+                //TODO: debug some issue with re-printing (I think there is a timeout exception)
                 message = serialPort.ReadLine();
                 Console.WriteLine(message);
-                AppendToFile(fileName, message);
+                if (message != null && message[0] == '$')
+                    AppendToFile(fileName, message);
 
             }
             catch (TimeoutException) { }

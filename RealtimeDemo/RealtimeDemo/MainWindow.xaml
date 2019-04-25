@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf" 
         xmlns:pt="clr-namespace:PropertyTools.Wpf;assembly=PropertyTools.Wpf" 
-        Title="RealtimeDemo" Height="500" Width="640">
+        Title="RealtimeDemo" Height="700" Width="1100">
     <DockPanel>
         <StackPanel Orientation="Vertical" Margin="10">
             <StackPanel Orientation="Horizontal">
@@ -13,8 +13,13 @@
                 <Label>Average Pressure (mBar):</Label>
                 <TextBox Text="{Binding PressureAverage, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
             </StackPanel>
-            <oxy:PlotView x:Name="plot1" Model="{Binding TempPlotModel}" Width="500" Height="300"/>
-            <oxy:PlotView x:Name="plot2" Model="{Binding PressurePlotModel}" Width="500" Height="300"/>
+            <StackPanel Orientation="Horizontal">
+                <oxy:PlotView x:Name="plot1" Model="{Binding TempPlotModel}" Width="500" Height="300"/>
+                <oxy:PlotView x:Name="plot2" Model="{Binding PressurePlotModel}" Width="500" Height="300"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <oxy:PlotView x:Name="plot3" Model="{Binding AltPlotModel}" Width="500" Height="300"/>
+            </StackPanel>
         </StackPanel>
     </DockPanel>
 </Window>

@@ -60,17 +60,13 @@ namespace MapsExample
             //}
 
             // config map
-            MainMap = new GMapControl();
+            MainMap = (GMapControl)Application.Current.MainWindow.FindName("MainMap");
             MainMap.MapProvider = GMapProviders.OpenStreetMap;
             MainMap.Manager.Mode = AccessMode.ServerAndCache;
 
             MainMap.MinZoom = 0;
             MainMap.MaxZoom = 24;
             MainMap.Zoom = 18;
-
-            var lat2 = Nmea2DecDeg("4104.5567", "N");
-            var long2 = Nmea2DecDeg("08130.8436", "W");
-            MainMap.Position = new PointLatLng(lat2, long2);
 
             GMapMarker marker = new GMapMarker(new PointLatLng(0, 0));
             marker.ZIndex = -1;
@@ -134,8 +130,6 @@ namespace MapsExample
                 MainMap.MinZoom = 0;
                 MainMap.MaxZoom = 24;
                 MainMap.Zoom = 18;
-
-                //MainMap.InvalidateVisual();
             }
 
             this.RaisePropertyChanged("Distance");
@@ -195,31 +189,16 @@ namespace MapsExample
 
                                 int milliseconds = rd.Min * 60 + rd.Sec + rd.Msec / 1000;
 
-                                //TODO: parse NMEA format? move to other place
+                                //TODO: read in user location
                                 var lat2 = Nmea2DecDeg("4104.5938", "N");
                                 var long2 = Nmea2DecDeg("08130.7754", "W");
 
                                 var lat1 = Nmea2DecDeg(rd.Lat.ToString(), rd.LatHemisphere.ToString());
                                 var long1 = Nmea2DecDeg(rd.Long.ToString(), rd.LongHemisphere.ToString());
 
-                                //var lat2 = Nmea2DecDeg("4104.5567", "N");
-                                //var long2 = Nmea2DecDeg("08130.8436", "W");
-
                                 LocatorModel locationData = new LocatorModel();
                                 locationData.RocketLocation = new PointLatLng(lat1, long1);
                                 locationData.UserLocation = new PointLatLng(lat2, long2);
-
-                                //try
-                                //{
-                                //    double lat = Nmea2DecDeg("4104.5938", "N");
-                                //    double lng = Nmea2DecDeg("08130.7754", "W");
-
-
-                                //}
-                                //catch (Exception ex)
-                                //{
-                                //    MessageBox.Show("incorrect coordinate format: " + ex.Message);
-                                //}
 
                                 distance = GMapProviders.EmptyProvider.Projection.GetDistance(locationData.UserLocation, locationData.RocketLocation) * 0.62137; //convert km to miles
                                 bearing = GMapProviders.EmptyProvider.Projection.GetBearing(locationData.UserLocation, locationData.RocketLocation);
@@ -281,6 +260,7 @@ namespace MapsExample
 
             if (!double.TryParse(data[9], out double Lat))
                 Lat = 0;
+            
             //TODO: check if the length is long enough
             if (!char.TryParse(data[10], out char LatHemi))
                 LatHemi = '\0';
