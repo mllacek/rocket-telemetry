@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using GMap.NET;
 using GMap.NET.MapProviders;
+using GMap.NET.WindowsPresentation;
 
 namespace MapsExample
 {
@@ -25,7 +27,6 @@ namespace MapsExample
         public MainWindow()
         {
             InitializeComponent();
-
             this.DataContext = new MainViewModel();
         }
 
