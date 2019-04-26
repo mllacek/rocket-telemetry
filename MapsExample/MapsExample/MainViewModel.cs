@@ -35,6 +35,9 @@ namespace MapsExample
         public double Distance { get; private set; }
         public double Bearing { get; private set; }
 
+        public double Current1 { get; private set; }
+        public double Current2 { get; private set; }
+
         public GMapControl MainMap { get; private set; }
 
         public MainViewModel()
@@ -123,13 +126,15 @@ namespace MapsExample
             {
                 CurrentLocation = currentLocation;
                 MainMap.Position = CurrentLocation.RocketLocation;
+                Current1 = CurrentLocation.RocketLocation.Lat;
+                Current2 = CurrentLocation.RocketLocation.Lng;
                 GMapMarker marker = new GMapMarker(CurrentLocation.RocketLocation);
                 marker.ZIndex = -1;
                 MainMap.Markers.Add(marker);
 
                 MainMap.MinZoom = 0;
                 MainMap.MaxZoom = 24;
-                MainMap.Zoom = 18;
+                MainMap.Zoom = 19;
             }
 
             this.RaisePropertyChanged("Distance");
@@ -137,6 +142,8 @@ namespace MapsExample
             this.RaisePropertyChanged("CurrentLocation");
             this.RaisePropertyChanged("SelectedPath");
             this.RaisePropertyChanged("MainMap");
+            this.RaisePropertyChanged("Current1");
+            this.RaisePropertyChanged("Current2");
         }
 
 
@@ -189,10 +196,11 @@ namespace MapsExample
 
                                 int milliseconds = rd.Min * 60 + rd.Sec + rd.Msec / 1000;
 
-                                //TODO: read in user location
-                                var lat2 = Nmea2DecDeg("4104.5938", "N");
-                                var long2 = Nmea2DecDeg("08130.7754", "W");
+                                //read in user location
+                                var lat2 = Nmea2DecDeg(rd.GroundLat.ToString(), rd.GroundLatHemisphere.ToString());
+                                var long2 = Nmea2DecDeg(rd.GroundLong.ToString(), rd.GroundLongHemisphere.ToString());
 
+                                //rocket location
                                 var lat1 = Nmea2DecDeg(rd.Lat.ToString(), rd.LatHemisphere.ToString());
                                 var long1 = Nmea2DecDeg(rd.Long.ToString(), rd.LongHemisphere.ToString());
 
@@ -200,7 +208,7 @@ namespace MapsExample
                                 locationData.RocketLocation = new PointLatLng(lat1, long1);
                                 locationData.UserLocation = new PointLatLng(lat2, long2);
 
-                                distance = GMapProviders.EmptyProvider.Projection.GetDistance(locationData.UserLocation, locationData.RocketLocation) * 0.62137; //convert km to miles
+                                distance = GMapProviders.EmptyProvider.Projection.GetDistance(locationData.UserLocation, locationData.RocketLocation) * 0.62137 * 5280; //convert km to feet
                                 bearing = GMapProviders.EmptyProvider.Projection.GetBearing(locationData.UserLocation, locationData.RocketLocation);
 
                                 currentLocation = locationData;
@@ -227,7 +235,13 @@ namespace MapsExample
             public double Long { get; set; }
             public char LongHemisphere { get; set; }
 
-            public RocketData(int m, int s, int ms, double lat, char latHemi, double lon, char longHemi)
+            //TODO: add ground station location
+            public double GroundLat { get; set; }
+            public char GroundLatHemisphere { get; set; }
+            public double GroundLong { get; set; }
+            public char GroundLongHemisphere { get; set; }
+
+            public RocketData(int m, int s, int ms, double lat, char latHemi, double lon, char longHemi, double glat, char glatHemi, double glon, char glongHemi)
             {
                 Min = m;
                 Sec = s;
@@ -236,6 +250,10 @@ namespace MapsExample
                 LatHemisphere = latHemi;
                 Long = lon;
                 LongHemisphere = longHemi;
+                GroundLat = glat;
+                GroundLatHemisphere = glatHemi;
+                GroundLong = glon;
+                GroundLongHemisphere = glongHemi;
             }
 
         }
@@ -258,10 +276,10 @@ namespace MapsExample
             if (!int.TryParse(time.Split('.')[1], out int Msec))
                 Msec = 0;
 
+            //TODO: check if the length is long enough
             if (!double.TryParse(data[9], out double Lat))
                 Lat = 0;
             
-            //TODO: check if the length is long enough
             if (!char.TryParse(data[10], out char LatHemi))
                 LatHemi = '\0';
 
@@ -271,9 +289,21 @@ namespace MapsExample
             if (!char.TryParse(data[12], out char LongHemi))
                 LongHemi = '\0';
 
+            if (!double.TryParse(data[13], out double gLat))
+                Lat = 0;
+
+            if (!char.TryParse(data[14], out char gLatHemi))
+                LatHemi = '\0';
+
+            if (!double.TryParse(data[15], out double gLong))
+                Long = 0;
+
+            if (!char.TryParse(data[16], out char gLongHemi))
+                LongHemi = '\0';
+
             //we can ignore the other data for this application
 
-            RocketData parsedData = new RocketData(Min, Sec, Msec, Lat, LatHemi, Long, LongHemi);
+            RocketData parsedData = new RocketData(Min, Sec, Msec, Lat, LatHemi, Long, LongHemi, gLat, gLatHemi, gLong, gLongHemi);
 
             return parsedData;
         }

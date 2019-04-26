@@ -8,17 +8,25 @@
         <StackPanel Orientation="Vertical" Margin="10">
             <StackPanel Orientation="Horizontal">
                 <Button Name="btnOpenFile" Command="{Binding ButtonCommand}" Width="100">Choose File</Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
                 <Label>Average Temperature (degrees C):</Label>
                 <TextBox Text="{Binding TempAverage, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
                 <Label>Average Pressure (mBar):</Label>
                 <TextBox Text="{Binding PressureAverage, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
+                <Label>Max Altitude (ft):</Label>
+                <TextBox Text="{Binding MaxAltitude, Mode=OneWay, StringFormat={}{0:#,0.00}}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <oxy:PlotView x:Name="plot1" Model="{Binding TempPlotModel}" Width="500" Height="300"/>
                 <oxy:PlotView x:Name="plot2" Model="{Binding PressurePlotModel}" Width="500" Height="300"/>
+               
             </StackPanel>
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
                 <oxy:PlotView x:Name="plot3" Model="{Binding AltPlotModel}" Width="500" Height="300"/>
+                <oxy:PlotView x:Name="plot4" Model="{Binding AccelXPlotModel}" Width="500" Height="300"/>
+                <!--<oxy:PlotView x:Name="plot5" Model="{Binding AccelYPlotModel}" Width="500" Height="300"/>
+                <oxy:PlotView x:Name="plot6" Model="{Binding AccelZPlotModel}" Width="500" Height="300"/>-->
             </StackPanel>
         </StackPanel>
     </DockPanel>

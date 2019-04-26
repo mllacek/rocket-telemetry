@@ -9,7 +9,7 @@
 #include <libpic30.h>
 #include <stdio.h>
 
-#define MaxMsgSize 100
+#define MaxMsgSize 84
 
 int message[MaxMsgSize];
 int MsgLength = 0;
@@ -192,7 +192,8 @@ int main(void) {
     __C30_UART = 2;
     
     AD1PCFG = 0xFF; // Pins to digital
-     
+    
+    //accel
     TRISBbits.TRISB2 = 0; //Setting TRIS Bit to Digital Output
     PORTBbits.RB2 = 1; // CS Pin Pin 23 //RB2
     
@@ -204,6 +205,7 @@ int main(void) {
     TRISGbits.TRISG9 = 0; //Setting TRIS Bit to Digital Output
     PORTGbits.RG9 = 1; // CS Pin Pin 14 //RG9
     
+    //gyro
     TRISA = 0x00;
     PORTA = 0x01; //RA0, PIN 17
     
@@ -245,7 +247,7 @@ int main(void) {
         printf("Length:%d", strlen(mssg));
         
         SetMsg(mssg, strlen(mssg));
-        //SetMsg("Groupon",7);
+        
         tx_frame = BuildFrame(tx_frame);
         TxSend(tx_frame);
         ms_delay(250);

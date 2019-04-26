@@ -21,7 +21,7 @@ namespace RealtimeDemo
     public class MainViewModel : INotifyPropertyChanged, IDisposable
     {
         // try to change might be lower or higher than the rendering interval
-        private const int UpdateInterval = 30;
+        private const int UpdateInterval = 300;
 
         private bool disposed;
         private readonly Timer timer;
@@ -30,15 +30,23 @@ namespace RealtimeDemo
         private static PlotModel tempPlot = new PlotModel();
         private static PlotModel pressurePlot = new PlotModel();
         private static PlotModel altPlot = new PlotModel();
+        private static PlotModel accelXPlot = new PlotModel();
+        private static PlotModel accelYPlot = new PlotModel();
+        private static PlotModel accelZPlot = new PlotModel();
         private static bool _continue = true;
         public PlotModel TempPlotModel { get; private set; }
         public PlotModel PressurePlotModel { get; private set; }
         public PlotModel AltPlotModel { get; private set; }
+        public PlotModel AccelXPlotModel { get; private set; }
+        public PlotModel AccelYPlotModel { get; private set; }
+        public PlotModel AccelZPlotModel { get; private set; }
         public static double tempSum = 0;
         public static double pressureSum = 0;
+        public static double maxAlt = 0;
         public static int count = 0;
         public double TempAverage { get; private set; }
         public double PressureAverage { get; private set; }
+        public double MaxAltitude { get; private set; }
 
         public static double P0 = 0; //reference pressure
 
@@ -57,6 +65,8 @@ namespace RealtimeDemo
             {
                 SelectedPath = openFileDialog.FileName;
                 P0 = 0; //reset reference temp
+                maxAlt = 0;
+                MaxAltitude = 0;
             }
         }
 
@@ -81,8 +91,27 @@ namespace RealtimeDemo
             altPlot.Series.Add(new LineSeries { LineStyle = LineStyle.Solid });
             AltPlotModel = altPlot;
 
+            accelXPlot.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = "Acceleration X (g)" });
+            accelXPlot.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = "Time (sec)" });
+            accelXPlot.Series.Add(new LineSeries { LineStyle = LineStyle.Solid });
+            accelXPlot.DefaultColors = new List<OxyColor> { OxyColors.Purple };
+            AccelXPlotModel = accelXPlot;
+
+            //accelYPlot.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = "Acceleration Y (g)" });
+            //accelYPlot.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = "Time (sec)" });
+            //accelYPlot.Series.Add(new LineSeries { LineStyle = LineStyle.Solid });
+            //accelYPlot.DefaultColors = new List<OxyColor> { OxyColors.Purple };
+            //AccelYPlotModel = accelYPlot;
+
+            //accelZPlot.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = "Acceleration Z (g)" });
+            //accelZPlot.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = "Time (sec)" });
+            //accelZPlot.Series.Add(new LineSeries { LineStyle = LineStyle.Solid });
+            //accelZPlot.DefaultColors = new List<OxyColor> { OxyColors.Purple };
+            //AccelZPlotModel = accelZPlot;
+
             TempAverage = 0;
             PressureAverage = 0;
+            MaxAltitude = 0;
 
             SelectedPath = String.Empty;
             this.watch.Start();
@@ -90,6 +119,10 @@ namespace RealtimeDemo
             this.RaisePropertyChanged("TempPlotModel");
             this.RaisePropertyChanged("PressurePlotModel");
             this.RaisePropertyChanged("AltPlotModel");
+            //this.RaisePropertyChanged("AccelXPlotModel");
+            //this.RaisePropertyChanged("AccelYPlotModel");
+            //this.RaisePropertyChanged("AccelZPlotModel");
+            this.RaisePropertyChanged("MaxAltitude");
 
             this.timer.Change(1000, UpdateInterval);
 
@@ -122,8 +155,18 @@ namespace RealtimeDemo
             AltPlotModel = altPlot;
             AltPlotModel.InvalidatePlot(true);
 
-            TempAverage = 0;
-            PressureAverage = 0;
+            AccelXPlotModel = accelXPlot;
+            AccelXPlotModel.InvalidatePlot(true);
+
+            //AccelYPlotModel = accelYPlot;
+            //AccelYPlotModel.InvalidatePlot(true);
+
+            //AccelZPlotModel = accelZPlot;
+            //AccelZPlotModel.InvalidatePlot(true);
+
+            //TempAverage = 0;
+            //PressureAverage = 0;
+            MaxAltitude = maxAlt;
 
             if (count > 0)
             {
@@ -131,9 +174,9 @@ namespace RealtimeDemo
                 PressureAverage = pressureSum / count;
             }
 
-
             this.RaisePropertyChanged("TempAverage");
             this.RaisePropertyChanged("PressureAverage");
+            this.RaisePropertyChanged("MaxAltitude");
         }
 
         private static void Update()
@@ -145,6 +188,9 @@ namespace RealtimeDemo
                     tempPlot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid}; //Remove old data
                     pressurePlot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid};
                     altPlot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid };
+                    accelXPlot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid };
+                    //accelYPlot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid };
+                    //accelZPlot.Series[0] = new LineSeries { LineStyle = LineStyle.Solid };
 
                     var wh = new AutoResetEvent(false);
                     var fsw = new FileSystemWatcher(".");
@@ -166,10 +212,14 @@ namespace RealtimeDemo
                                 var tempSeries = (LineSeries)tempPlot.Series[0];
                                 var pressureSeries = (LineSeries)pressurePlot.Series[0];
                                 var altitudeSeries = (LineSeries)altPlot.Series[0];
+                                var accelXSeries = (LineSeries)accelXPlot.Series[0];
+                                //var accelYSeries = (LineSeries)accelYPlot.Series[0];
+                                //var accelZSeries = (LineSeries)accelZPlot.Series[0];
 
                                 int milliseconds = rd.Min * 60 + rd.Sec + rd.Msec/1000;
 
                                 count++;
+                                
                                 tempSum += rd.Temp;
                                 pressureSum += rd.Pressure;
 
@@ -197,14 +247,28 @@ namespace RealtimeDemo
 
                                 double h = 0;
                                 if (P0 != 0 && pressureHg/P0 > 0) //TODO: I think this can only pick up on altitude changes....
-                                    h = ((Math.Log(pressureHg / P0)) * (R * tempKelvin) / (-g * M)) + h0;
+                                    h = ((Math.Log(pressureHg / P0)) * (R * tempKelvin) / (-g * M))*3.28084 + h0;
 
                                 tempSeries.Points.Add(new DataPoint(milliseconds, rd.Temp));
                                 tempPlot.Series[0] = tempSeries;
 
                                 pressureSeries.Points.Add(new DataPoint(milliseconds, rd.Pressure));
-                                altitudeSeries.Points.Add(new DataPoint(milliseconds, h * 3.28084)); //convert to feet
                                 pressurePlot.Series[0] = pressureSeries;
+
+                                altitudeSeries.Points.Add(new DataPoint(milliseconds, h)); //convert to feet
+                                altPlot.Series[0] = altitudeSeries;
+
+                                accelXSeries.Points.Add(new DataPoint(milliseconds, rd.AccelX));
+                                accelXPlot.Series[0] = accelXSeries;
+
+                                //accelYSeries.Points.Add(new DataPoint(milliseconds, rd.AccelY));
+                                //accelYPlot.Series[0] = accelYSeries;
+
+                                //accelZSeries.Points.Add(new DataPoint(milliseconds, rd.AccelZ));
+                                //accelZPlot.Series[0] = accelZSeries;
+
+                                if (h > maxAlt)
+                                    maxAlt = h;
 
                             }
                             else

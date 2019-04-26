@@ -14,7 +14,7 @@ unsigned int TEMPSENS= 0; // temp coeff of the temp C6
 
 void SPIBarStart() {
     //PORTGbits.RG9 = 0; // CS Pin Pin 14 //RG9
-    PORTBbits.RB1 = 0;
+    PORTBbits.RB1 = 0; //PIN24
 }
 
 void SPIBarEnd() {
